@@ -16,6 +16,7 @@ langchain-text-splitters
 # ============================================================================
 # OpenAI (required)
 langchain-openai
+langchain-groq
 openai
 
 # Google Gemini (optional - for Notebook 04)
@@ -65,6 +66,7 @@ lxml
 # ============================================================================
 # Environment Management (required)
 python-dotenv
+pyyaml
 
 # Token counting (required for cost estimation)
 tiktoken
