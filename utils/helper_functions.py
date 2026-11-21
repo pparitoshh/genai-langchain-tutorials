@@ -1,6 +1,6 @@
+from project_config import get_embeddings
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 from pydantic import BaseModel, Field
 from langchain_core.prompts import PromptTemplate
@@ -70,7 +70,7 @@ def encode_pdf(path, chunk_size=1000, chunk_overlap=200):
     cleaned_texts = replace_t_with_space(texts)
 
     # Create embeddings and vector store
-    embeddings = OpenAIEmbeddings()
+    embeddings = get_embeddings()
     vectorstore = FAISS.from_documents(cleaned_texts, embeddings)
 
     return vectorstore
@@ -117,7 +117,7 @@ def encode_from_string(content, chunk_size=1000, chunk_overlap=200):
             chunk.metadata['relevance_score'] = 1.0
 
         # Generate embeddings and create the vector store
-        embeddings = OpenAIEmbeddings()
+        embeddings = get_embeddings()
         vectorstore = FAISS.from_documents(chunks, embeddings)
 
     except Exception as e:
@@ -350,8 +350,7 @@ def get_langchain_embedding_provider(provider: EmbeddingProvider, model_id: str 
         ValueError: If the specified provider is not supported.
     """
     if provider == EmbeddingProvider.OPENAI:
-        from langchain_openai import OpenAIEmbeddings
-        return OpenAIEmbeddings()
+        return get_embeddings()
     elif provider == EmbeddingProvider.COHERE:
         from langchain_cohere import CohereEmbeddings
         return CohereEmbeddings()

@@ -5,3 +5,7 @@ llm:
   # Groq model name. Run `curl https://api.groq.com/openai/v1/models` with your key
   # to see the models that your key can use.
   model: qwen/qwen3.8-27b
+
+embeddings:
+  # Groq has no embedding API. The notebooks use this local model instead.
+  model: sentence-transformers/all-MiniLM-L6-v2

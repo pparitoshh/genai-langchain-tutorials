@@ -1,3 +1,4 @@
+from project_config import get_llm
 """
 RAG Evaluation Script
 
@@ -19,7 +20,6 @@ from typing import List, Tuple, Dict, Any
 from deepeval import evaluate
 from deepeval.metrics import GEval, FaithfulnessMetric, ContextualRelevancyMetric
 from deepeval.test_case import LLMTestCase, LLMTestCaseParams
-from langchain_openai import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
@@ -105,7 +105,7 @@ def evaluate_rag(retriever, num_questions: int = 5) -> Dict[str, Any]:
     """
     
     # Initialize LLM
-    llm = ChatOpenAI(temperature=0, model_name="gpt-4o")
+    llm = get_llm(temperature=0)
     
     # Create evaluation prompt
     eval_prompt = PromptTemplate.from_template("""
