@@ -18,6 +18,7 @@ import json
 from typing import List, Tuple, Dict, Any
 
 from deepeval import evaluate
+from deepeval.models import DeepEvalBaseLLM
 from deepeval.metrics import GEval, FaithfulnessMetric, ContextualRelevancyMetric
 from deepeval.test_case import LLMTestCase, LLMTestCaseParams
 from langchain_core.prompts import PromptTemplate
@@ -67,10 +68,36 @@ def create_deep_eval_test_cases(
         )
     ]
 
+class GroqJudge(DeepEvalBaseLLM):
+    """Use the Groq model from config.yaml as the judge model for deepeval."""
+
+    def __init__(self):
+        self.model = get_llm(temperature=0)
+
+    def load_model(self):
+        return self.model
+
+    def generate(self, prompt: str, schema=None):
+        if schema is not None:
+            result = self.model.with_structured_output(schema).invoke(prompt)
+            return result
+        return self.model.invoke(prompt).content
+
+    async def a_generate(self, prompt: str, schema=None):
+        if schema is not None:
+            return await self.model.with_structured_output(schema).ainvoke(prompt)
+        return (await self.model.ainvoke(prompt)).content
+
+    def get_model_name(self):
+        return "groq"
+
+
+judge_model = GroqJudge()
+
 # Define evaluation metrics
 correctness_metric = GEval(
     name="Correctness",
-    model="gpt-4o",
+    model=judge_model,
     evaluation_params=[
         LLMTestCaseParams.EXPECTED_OUTPUT,
         LLMTestCaseParams.ACTUAL_OUTPUT
@@ -82,13 +109,13 @@ correctness_metric = GEval(
 
 faithfulness_metric = FaithfulnessMetric(
     threshold=0.7,
-    model="gpt-4o",
+    model=judge_model,
     include_reason=False
 )
 
 relevance_metric = ContextualRelevancyMetric(
     threshold=1,
-    model="gpt-4o",
+    model=judge_model,
     include_reason=True
 )
 
